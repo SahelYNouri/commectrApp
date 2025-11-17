@@ -9,8 +9,8 @@ router = APIRouter()
 
 #API schema for the generate request body
 class GenerateRequest(BaseModel):
-    target_name = str
-    target_role= str
+    target_name: str
+    target_role: str
     target_company: str
     linkedin_url: HttpUrl
     company: str | None = None
