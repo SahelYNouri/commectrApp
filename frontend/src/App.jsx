@@ -35,7 +35,7 @@ function AuthForm({ onAuthed }) {
     <div className="min-h-screen flex items-center justify-center bg-slate-100">
       <div className="bg-white shadow-md rounded-xl p-8 w-full max-w-md">
         <h1 className="text-2xl font-semibold mb-4 text-center">
-          ColdConnect - {mode === "login" ? "Login" : "Sign Up"}
+          Commectr - {mode === "login" ? "Login" : "Sign Up"}
         </h1>
         {error && <p className="text-red-500 text-sm mb-3">{error}</p>}
         <form onSubmit={handleSubmit} className="space-y-4">
