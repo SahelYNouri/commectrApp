@@ -1,3 +1,23 @@
-Commectr is a cold message app that allows users to enter in different fields of information regarding someone and help create a cold message for them from scratch
+# Commectr
 
-**Feature to be implemented-- keep a list of all people users have reached out to to help keep track of who they have connected with
+Commectr is a web app that helps students and early professionals generate **personalized cold outreach messages** for LinkedIn using AI.
+
+Users copy key info from a person’s LinkedIn profile (name, role, URL, experiences, posts, etc.), describe their goal, and ColdConnect generates a tailored message ready to send.
+
+## Stack
+
+- **Frontend:** React (Vite), Tailwind CSS, Supabase JS
+- **Backend:** FastAPI (Python)
+- **Auth & DB:** Supabase (Postgres + RLS)
+- **AI:** OpenAI Chat Completions API
+
+## Core Features (MVP)
+
+- Email/password signup & login (Supabase Auth)
+- Form for target person:
+  - Required: name, role, LinkedIn URL
+  - Optional: company, experiences, posts, education, notes
+- Goal prompt (what you want the message to do)
+- AI-generated outreach message using OpenAI
+- History of past contacts + messages
+
