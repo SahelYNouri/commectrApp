@@ -6,7 +6,7 @@ import Dashboard from './components/Dashboard';
 
 export default function App() {
   const [view, setView] = useState('login'); // 'login' | 'signup' | 'dashboard'
-  const [session, setSession] = useState(null);
+  const [session, setSession] = useState(null); //supabase session object, null if logged out
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
