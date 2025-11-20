@@ -44,8 +44,8 @@ export default function Dashboard({ onLogout }) {
       <header className="header">
         <div className="header-content">
           <div className="header-left">
-            <div className="logo-small">CC</div>
-            <h1 className="header-title">ColdConnect</h1>
+            <div className="logo-small">CR</div>
+            <h1 className="header-title">Commectr</h1>
           </div>
           <nav className="nav">
             <button
