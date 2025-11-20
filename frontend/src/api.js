@@ -9,7 +9,7 @@ export async function backendRequest(path, method = "GET", body) {
   //gets the current user session to get the jwt token, if no session it throws an error and stops the request  
   const session = await getSession();
   if (!session) throw new Error("Not authenticated");
-  
+
   //makes an http request to teh backend api with the jwt token in the auth header using axios
   const res = await axios({
     url: `${API_BASE}${path}`,
