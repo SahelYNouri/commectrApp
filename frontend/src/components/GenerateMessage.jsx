@@ -26,6 +26,12 @@ export default function GenerateMessage({ onMessageGenerated }) {
       return;
     }
 
+    // Basic LinkedIn URL validation
+    if (!/^https?:\/\/(www\.)?linkedin\.com\/.*$/.test(form.linkedin_url)) {
+      setError('Please enter a valid LinkedIn URL');
+      return;
+    }
+
     setError('');
     setLoading(true);
 

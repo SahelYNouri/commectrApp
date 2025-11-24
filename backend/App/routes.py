@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Request, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, HttpUrl
 from typing import List
 from .supabase_client import supabase
 from .auth_utils import get_current_user
@@ -8,16 +8,17 @@ from .openai_client import generate_cold_message
 router = APIRouter()
 
 #API schema for the generate request body
+#added input validation using string length constraints
 class GenerateRequest(BaseModel):
-    target_name: str
-    target_role: str
-    linkedin_url: str
-    company: str | None = None
-    experiences: str | None= None
-    recent_post: str | None= None
-    education: str | None=None
-    other_notes: str | None = None
-    goal_prompt: str
+    target_name: str = Field(max_length=100)
+    target_role: str = Field(max_length=100)
+    linkedin_url: HttpUrl
+    company: str | None = Field(default=None, max_length=200)
+    experiences: str | None= Field(default=None, max_length=2000)
+    recent_post: str | None= Field(default=None, max_length=2000)
+    education: str | None= Field(default=None, max_length=1000)
+    other_notes: str | None = Field(default=None, max_length=1000)
+    goal_prompt: str = Field(max_length=1000)
 
 #Api schema for a message history item
 class MessageHistoryItem(BaseModel):
