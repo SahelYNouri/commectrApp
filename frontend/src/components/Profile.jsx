@@ -1,8 +1,10 @@
 import '../styles/dashboard.css';
 
 export default function Profile({ history }) {
+  const totalMessages = history.length;
   const contacted = history.filter((h) => h.contacted).length;
-  const pending = history.length - contacted;
+  const pending = history.filter((h) => h.contacted && !h.replied).length;
+  const replied= history.filter((h) => h.replied).length;
 
   return (
     <div className="profile-container">
@@ -12,12 +14,16 @@ export default function Profile({ history }) {
 
         <div className="profile-stats">
           <div className="stat-card">
-            <div className="stat-number">{history.length}</div>
+            <div className="stat-number">{totalMessages}</div>
             <div className="stat-label">Messages Generated</div>
           </div>
           <div className="stat-card">
             <div className="stat-number">{contacted}</div>
             <div className="stat-label">Contacted</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-number">{replied}</div>
+            <div className="stat-label">Replied</div>
           </div>
           <div className="stat-card">
             <div className="stat-number">{pending}</div>
