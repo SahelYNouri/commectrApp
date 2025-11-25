@@ -1,10 +1,12 @@
-import '../styles/dashboard.css';
+import "../styles/dashboard.css";
 
-export default function Checklist({ history, onToggleContacted }) {
+export default function Checklist({ history, onToggleStatus }) {
   return (
     <div className="checklist-container">
       <h2 className="section-title">Outreach Checklist</h2>
-      <p className="section-subtitle">Track who you've contacted</p>
+      <p className="section-subtitle">
+        Track who you've contacted and who replied
+      </p>
 
       {history.length === 0 ? (
         <div className="empty-state">
@@ -16,24 +18,46 @@ export default function Checklist({ history, onToggleContacted }) {
         <div className="checklist-list">
           {history.map((item) => (
             <div key={item.id} className="checklist-item">
-              <button
-                className={`checkbox ${item.contacted ? 'checkbox-checked' : ''}`}
-                onClick={() => onToggleContacted(item.id)}
-              >
-                {item.contacted && '✓'}
-              </button>
+              {/* LEFT: contact + reply toggles */}
+              <div className="checklist-toggles">
+                {/* CONTACTED TOGGLE */}
+                <button
+                  className={`checkbox ${
+                    item.contacted ? "checkbox-checked" : ""
+                  }`}
+                  onClick={() => onToggleStatus(item.id, "contacted")}
+                  title="Mark as contacted"
+                >
+                  {item.contacted && "✓"}
+                </button>
+
+                {/* REPLIED TOGGLE */}
+                <button
+                  className={`checkbox replied-checkbox ${
+                    item.replied ? "checkbox-checked" : ""
+                  }`}
+                  onClick={() => onToggleStatus(item.id, "replied")}
+                  title="Mark as replied"
+                >
+                  {item.replied && "↩"}
+                </button>
+              </div>
+
+              {/* MIDDLE: name + role */}
               <div className="checklist-info">
                 <h3
                   className={`checklist-name ${
-                    item.contacted ? 'checklist-name-completed' : ''
+                    item.contacted ? "checklist-name-completed" : ""
                   }`}
                 >
                   {item.target_name}
                 </h3>
                 <p className="checklist-role">
-                  {item.target_role} • {item.company || 'No company'}
+                  {item.target_role} • {item.company || "No company"}
                 </p>
               </div>
+
+              {/* RIGHT: LinkedIn link */}
               <a
                 href={item.linkedin_url}
                 target="_blank"

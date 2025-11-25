@@ -5,6 +5,7 @@ import History from './History';
 import Checklist from './Checklist';
 import Profile from './Profile';
 import '../styles/dashboard.css';
+import {backendRequest} from '../api';
 
 export default function Dashboard({ onLogout }) {
   const [activeTab, setActiveTab] = useState('generate');
@@ -17,7 +18,6 @@ export default function Dashboard({ onLogout }) {
 
   async function loadHistory() {
     try {
-      const { backendRequest } = await import('../api');
       const data = await backendRequest('/history', 'GET');
       setHistory(data);
     } catch (err) {
@@ -31,12 +31,39 @@ export default function Dashboard({ onLogout }) {
     setActiveTab('result');
   }
 
-  function toggleContacted(id) {
+//generic function to toggle contacted/replied status
+  async function toggleStatus(messageId, field) {
+
+    //find the message and its current contacted value
+  const msg = history.find((item) => item.id === messageId);
+  if (!msg) return;
+
+  const newValue = !msg[field];
+
     setHistory((prev) =>
       prev.map((item) =>
-        item.id === id ? { ...item, contacted: !item.contacted } : item
+        item.id === messageId ? { ...item, [field]: newValue } : item
       )
     );
+ 
+    try {
+      const body = { [field]: newValue }; //{ contacted: true } or { replied: false }
+
+      // 2) Tell the backend to update status_sent on the contact
+      await backendRequest(
+        `/contacts/${msg.contact_id}/status`,
+        'PATCH',
+        body
+      );
+    } catch (err) {
+      console.error('Failed to update contact status', err);
+      // 3) Roll back UI if backend failed
+      setHistory((prev) =>
+        prev.map((item) =>
+          item.id === messageId ? { ...item, [field]: msg[field] } : item
+        )
+      );
+    }
   }
 
   return (
@@ -91,7 +118,7 @@ export default function Dashboard({ onLogout }) {
         )}
         {activeTab === 'history' && <History history={history} />}
         {activeTab === 'checklist' && (
-          <Checklist history={history} onToggleContacted={toggleContacted} />
+          <Checklist history={history} onToggleStatus={toggleStatus} />
         )}
         {activeTab === 'profile' && <Profile history={history} />}
       </main>
