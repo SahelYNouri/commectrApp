@@ -79,7 +79,7 @@ export default function Dashboard({ onLogout }) {
         <div className="header-content">
           <div className="header-left">
             <div className="logo-small">CR</div>
-            <h1 className="header-title">LinqDm</h1>
+            <h1 className="header-title">Commectr</h1>
           </div>
           <nav className="nav">
             <button
