@@ -4,8 +4,8 @@ export default function Checklist({ history, onToggleStatus, updatingId }) {
   
   return (
     <div className="checklist-container">
-      <h2 className="section-title">Outreach Checklist</h2>
-      <p className="section-subtitle">
+      <h2 className="section-titlev2">Outreach Checklist</h2>
+      <p className="section-subtitlev2">
         Track who you've contacted and who replied
       </p>
 

@@ -1,15 +1,30 @@
+:root{
+  --bg-main: #020b25;
+  --bg-card: #07142e;
+  --bg-card-soft: #0b1634;
+
+  --primary-1: #1e90ff;
+  --primary-2: #1c6fff;
+  --accent-1: #00b5ff;
+
+  --text-main: #f7fafc;
+  --text-muted: #94a3b8;
+
+  --border-soft: #1f2937;
+}
+
 .dashboard {
   min-height: 100vh;
-  background: #f7fafc;
+  background: var(--bg-main);
 }
 
 .header {
-  background: white;
-  border-bottom: 1px solid #e2e8f0;
+  background: rgba(3, 11, 33, 0.96);
+  border-bottom: 1px solid var(--border-soft);
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 30px rgba(0, 0, 0, 0.45);
 }
 
 .header-content {
@@ -29,26 +44,13 @@
   gap: 12px;
 }
 
-.logo-small {
-  width: 40px;
-  height: 40px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  font-weight: bold;
-  color: white;
-}
-
 .logo-mark {
   width: 60px;      
   height: 60px;
   border-radius: 12px;
   object-fit: contain; /* keeps the aspect ratio */
   background: radial-gradient(circle at 30% 20%, var(--accent-1), var(--primary-2));
-  padding: 0px;        /* optional: little “pill” feel around the logo */
+  padding: 4px;        /* optional: little “pill” feel around the logo */
   box-shadow: 0 6px 14px rgba(0, 181, 255, 0.35);
 }
 
@@ -56,7 +58,7 @@
 .header-title {
   font-size: 20px;
   font-weight: 700;
-  color: #1a202c;
+  color: var(--text-main);
   margin: 0;
 }
 
@@ -68,36 +70,37 @@
 
 .nav-button {
   padding: 8px 16px;
-  background: none;
+  background: transparent;
   border: none;
   border-radius: 8px;
   font-size: 14px;
   font-weight: 500;
-  color: #718096;
+  color: var(--text-muted);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.15s;
 }
 
 .nav-button:hover {
-  background: #f7fafc;
-  color: #2d3748;
+  background: rgba(15, 23, 42, 0.9);
+  color: var(--text-main);
 }
 
 .nav-button-active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--priamry-1), var(--primary-2));
   color: white !important;
+  box-shadow: 0 8px 18px rgba(30, 144, 255, 0.4);
 }
 
 .logout-button {
   padding: 8px 20px;
-  background: #1a202c;
-  color: white;
-  border: none;
+  background: #0f172a;
+  color:var(--text-main);
+  border: 1px solid var(--border-soft);
   border-radius: 8px;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.2s, border-color 0.15s;
 }
 
 .logout-button:hover {
@@ -130,8 +133,21 @@
   margin: 0 0 8px 0;
 }
 
+.section-titlev2{
+   font-size: 24px;
+  font-weight: 700;
+  color: white;
+  margin: 0 0 8px 0;
+}
+
 .section-subtitle {
   color: #718096;
+  font-size: 14px;
+  margin: 0 0 24px 0;
+}
+
+.section-subtitlev2 {
+  color: #cbd5e0;
   font-size: 14px;
   margin: 0 0 24px 0;
 }
