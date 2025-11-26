@@ -4,8 +4,34 @@ from typing import List
 from .supabase_client import supabase
 from .auth_utils import get_current_user
 from .openai_client import generate_cold_message
+import time
+from collections import defaultdict, deque
 
 router = APIRouter()
+
+#simple in-memory rate limiting data structures
+RATE_LIMIT_WINDOW_SECONDS = 60     # 1 minute window
+RATE_LIMIT_MAX_REQUESTS = 10        # e.g. 10 messages per minute per user
+
+user_generate_timestamps: dict[str, deque[float]] = defaultdict(deque)
+
+def check_generate_rate_limit(user_id: str):
+    user_id = str(user_id)  #ensure its a string
+    now = time.time()
+    dq = user_generate_timestamps[user_id]
+
+    #drop timestamps older than windo
+    while dq and (now - dq[0] > RATE_LIMIT_WINDOW_SECONDS):
+        dq.popleft()
+
+    if len(dq) >= RATE_LIMIT_MAX_REQUESTS:
+        raise HTTPException(
+            status_code=429,
+            detail="Rate limit exceeded: Too many generate requests. Please try again later.",
+        )
+
+    # Record the new request timestamp
+    dq.append(now)
 
 #API schema for the generate request body
 #added input validation using string length constraints
@@ -98,6 +124,9 @@ async def generate_message(payload: GenerateRequest, request: Request):
     
     #read the auth header and returns the current user, then calls above function to see if app user exists or not in the db
     current_user = get_current_user(request)
+
+    check_generate_rate_limit(current_user.id)
+
     app_user = ensure_app_user(current_user.id, current_user.email)
     app_user_id = app_user["id"] #set as the primary key of the app user row
 
