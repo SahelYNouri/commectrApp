@@ -1,0 +1,21 @@
+# Language: Python 3.11
+# Minimal production-ready FastAPI backend dependencies — adjust versions as needed
+
+fastapi==0.100.0
+uvicorn[standard]==0.22.0
+sqlalchemy==2.1.0
+alembic==1.11.0
+psycopg2-binary==2.9.10
+pydantic==2.2.1
+python-dotenv==1.0.0
+passlib[bcrypt]==1.7.4
+python-jose==3.3.0
+httpx==0.24.1
+redis==4.6.0
+gunicorn==20.1.0
+
+# Dev / testing tools
+pytest==7.4.3
+pytest-asyncio==0.21.0
+black==24.3.0
+mypy==1.7.0
