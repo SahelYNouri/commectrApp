@@ -33,7 +33,7 @@ export default function Login({ onSwitchToSignup, onLoginSuccess }) {
         <div className="auth-header">
           <div className="logo">
             <div className="logo-icon">CR</div>
-            <h1 className="logo-text">Commectr</h1>
+            <h1 className="logo-text">LinqDm</h1>
           </div>
           <p className="subtitle">Welcome back! Sign in to your account</p>
         </div>

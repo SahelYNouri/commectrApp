@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Request, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, HttpUrl
 from typing import List
 from .supabase_client import supabase
 from .auth_utils import get_current_user
@@ -8,16 +8,17 @@ from .openai_client import generate_cold_message
 router = APIRouter()
 
 #API schema for the generate request body
+#added input validation using string length constraints
 class GenerateRequest(BaseModel):
-    target_name: str
-    target_role: str
-    linkedin_url: str
-    company: str | None = None
-    experiences: str | None= None
-    recent_post: str | None= None
-    education: str | None=None
-    other_notes: str | None = None
-    goal_prompt: str
+    target_name: str = Field(max_length=100)
+    target_role: str = Field(max_length=100)
+    linkedin_url: HttpUrl
+    company: str | None = Field(default=None, max_length=200)
+    experiences: str | None= Field(default=None, max_length=2000)
+    recent_post: str | None= Field(default=None, max_length=2000)
+    education: str | None= Field(default=None, max_length=1000)
+    other_notes: str | None = Field(default=None, max_length=1000)
+    goal_prompt: str = Field(max_length=1000)
 
 #Api schema for a message history item
 class MessageHistoryItem(BaseModel):
@@ -29,6 +30,8 @@ class MessageHistoryItem(BaseModel):
     goal_prompt: str
     generated_message: str
     created_at: str
+    contacted: bool | None = None
+    replied:  bool | None = None
 
 def ensure_app_user(user_id: str, email: str | None):
     
@@ -103,7 +106,7 @@ async def generate_message(payload: GenerateRequest, request: Request):
         "user_id": app_user_id,    
         "target_name": payload.target_name,
         "target_role": payload.target_role,
-        "linkedin_url": payload.linkedin_url,
+        "linkedin_url": str(payload.linkedin_url),
         "company": payload.company,
         "experiences": payload.experiences,
         "recent_post": payload.recent_post,
@@ -171,6 +174,8 @@ async def generate_message(payload: GenerateRequest, request: Request):
         "goal_prompt": msg["goal_prompt"],
         "generated_message": msg["generated_message"],
         "created_at": msg["created_at"],
+        "contacted": contact.get("status_sent", False),
+        "replied": contact.get("status_replied", False),
     }
 
 #get request to fetch message history for the current user
@@ -189,7 +194,7 @@ async def history(request: Request):
             .from_("messages")
             .select(
                 "id, contact_id, goal_prompt, generated_message, created_at, "
-                "contacts (target_name, target_role, linkedin_url)"
+                "contacts (target_name, target_role, linkedin_url, status_sent, status_replied)"
             )
             .eq("user_id", app_user_id) #returns msgs that only belong to the user
             .order("created_at", desc=True) #returns msgs in order from newest first
@@ -216,9 +221,59 @@ async def history(request: Request):
                 "goal_prompt": row["goal_prompt"],
                 "generated_message": row["generated_message"],
                 "created_at": row["created_at"],
+                "contacted": contact.get("status_sent", False),
+                "replied": contact.get("status_replied", False),
             }
         )
     
     return items
+
+class ContactStatusUpdate(BaseModel):
+    contacted: bool | None = None
+    replied: bool | None = None
+    
+#endpoint to update contact/reply status
+@router.patch("/contacts/{contact_id}/status")
+async def update_contact_status(contact_id: str, payload: ContactStatusUpdate, request: Request):
+    current_user = get_current_user(request)
+    app_user = ensure_app_user(current_user.id, current_user.email)
+    app_user_id = app_user["id"]
+
+    # Build the update dict only with provided fields
+    update_fields: dict = {}
+    if payload.contacted is not None:
+        update_fields["status_sent"] = payload.contacted
+    if payload.replied is not None:
+        update_fields["status_replied"] = payload.replied
+
+    if not update_fields:
+        raise HTTPException(status_code=400, detail="No fields to update")
+
+    try:
+        res = (
+            supabase
+            .from_("contacts")
+            .update(update_fields)
+            .eq("id", contact_id)
+            .eq("user_id", app_user_id)  # ensure user owns this contact
+            .execute()
+        )
+    except Exception:
+        import traceback
+        err = traceback.format_exc()
+        print("Failed to update contact status:", err)
+        raise HTTPException(status_code=500, detail="failed to update contact status")
+
+    if not res.data:
+        raise HTTPException(status_code=404, detail="Contact not found")
+
+    # Optionally return the updated flags
+    updated = res.data[0]
+    return {
+        "contacted": updated.get("status_sent", False),
+        "replied": updated.get("status_replied", False),
+    }
+
+
 
 
