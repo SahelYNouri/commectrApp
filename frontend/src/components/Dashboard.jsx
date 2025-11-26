@@ -11,6 +11,7 @@ export default function Dashboard({ onLogout }) {
   const [activeTab, setActiveTab] = useState('generate');
   const [history, setHistory] = useState([]);
   const [latestMessage, setLatestMessage] = useState(null);
+  const [updatingId, setUpdatingId] = useState(null);
 
   useEffect(() => {
     loadHistory();
@@ -38,7 +39,11 @@ export default function Dashboard({ onLogout }) {
   const msg = history.find((item) => item.id === messageId);
   if (!msg) return;
 
+  if (updatingId === messageId) return; //prevents multiple rapid clicks
+
   const newValue = !msg[field];
+
+  setUpdatingId(messageId);
 
     setHistory((prev) =>
       prev.map((item) =>
@@ -63,6 +68,8 @@ export default function Dashboard({ onLogout }) {
           item.id === messageId ? { ...item, [field]: msg[field] } : item
         )
       );
+    } finally {
+      setUpdatingId(null);
     }
   }
 
@@ -118,7 +125,11 @@ export default function Dashboard({ onLogout }) {
         )}
         {activeTab === 'history' && <History history={history} />}
         {activeTab === 'checklist' && (
-          <Checklist history={history} onToggleStatus={toggleStatus} />
+          <Checklist 
+            history={history} 
+            onToggleStatus={toggleStatus}
+            updatingId={updatingId}
+          />
         )}
         {activeTab === 'profile' && <Profile history={history} />}
       </main>
