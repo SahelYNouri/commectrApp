@@ -3,8 +3,8 @@ import '../styles/dashboard.css';
 export default function History({ history }) {
   return (
     <div className="history-container">
-      <h2 className="section-title">Message History</h2>
-      <p className="section-subtitle">All your generated messages</p>
+      <h2 className="section-titlev2">Message History</h2>
+      <p className="section-subtitlev2">All your generated messages</p>
 
       {history.length === 0 ? (
         <div className="empty-state">
