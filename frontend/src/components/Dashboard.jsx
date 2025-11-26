@@ -78,7 +78,11 @@ export default function Dashboard({ onLogout }) {
       <header className="header">
         <div className="header-content">
           <div className="header-left">
-            <div className="logo-small">CR</div>
+            <img 
+              src= "/logo-mark.png"
+              alt= "Commectr Logo"
+              className="logo-mark"
+            />
             <h1 className="header-title">Commectr</h1>
           </div>
           <nav className="nav">
