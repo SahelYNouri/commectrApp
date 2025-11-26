@@ -1,6 +1,7 @@
 import "../styles/dashboard.css";
 
-export default function Checklist({ history, onToggleStatus }) {
+export default function Checklist({ history, onToggleStatus, updatingId }) {
+  
   return (
     <div className="checklist-container">
       <h2 className="section-title">Outreach Checklist</h2>
@@ -22,11 +23,9 @@ export default function Checklist({ history, onToggleStatus }) {
               <div className="checklist-toggles">
                 {/* CONTACTED TOGGLE */}
                 <button
-                  className={`checkbox ${
-                    item.contacted ? "checkbox-checked" : ""
-                  }`}
+                  className={`checkbox ${item.contacted ? "checkbox-checked" : ""}`}
                   onClick={() => onToggleStatus(item.id, "contacted")}
-                  title="Mark as contacted"
+                  disabled={updatingId === item.id}
                 >
                   {item.contacted && "✓"}
                 </button>
@@ -37,7 +36,7 @@ export default function Checklist({ history, onToggleStatus }) {
                     item.replied ? "checkbox-checked" : ""
                   }`}
                   onClick={() => onToggleStatus(item.id, "replied")}
-                  title="Mark as replied"
+                  disabled= {updatingId === item.id}
                 >
                   {item.replied && "↩"}
                 </button>
