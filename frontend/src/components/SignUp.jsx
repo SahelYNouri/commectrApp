@@ -43,7 +43,11 @@ export default function Signup({ onSwitchToLogin, onSignupSuccess }) {
       <div className="auth-card">
         <div className="auth-header">
           <div className="logo">
-            <div className="logo-icon">CR</div>
+            <img 
+              src= "/logo-mark.png"
+              alt= "Commectr Logo"
+              className="logo-mark"
+            />
             <h1 className="logo-text">Commectr</h1>
           </div>
           <p className="subtitle">Create your account to get started</p>
