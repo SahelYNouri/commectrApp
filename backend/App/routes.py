@@ -38,7 +38,7 @@ def check_generate_rate_limit(user_id: str):
 class GenerateRequest(BaseModel):
     target_name: str = Field(max_length=100)
     target_role: str = Field(max_length=100)
-    linkedin_url: HttpUrl
+    linkedin_url: str = Field(max_length=300)
     company: str | None = Field(default=None, max_length=200)
     experiences: str | None= Field(default=None, max_length=2000)
     recent_post: str | None= Field(default=None, max_length=2000)
@@ -130,12 +130,18 @@ async def generate_message(payload: GenerateRequest, request: Request):
     app_user = ensure_app_user(current_user.id, current_user.email)
     app_user_id = app_user["id"] #set as the primary key of the app user row
 
+    # Normalize linkedin_url: make sure it has http/https
+    raw_url = (payload.linkedin_url or "").strip()
+    if raw_url and not (raw_url.startswith("http://") or raw_url.startswith("https://")):
+        raw_url = "https://" + raw_url
+
+    
     #First, it builds a dict with fields matching the contacts table
     contact_data= {
         "user_id": app_user_id,    
         "target_name": payload.target_name,
         "target_role": payload.target_role,
-        "linkedin_url": str(payload.linkedin_url),
+        "linkedin_url": raw_url,
         "company": payload.company,
         "experiences": payload.experiences,
         "recent_post": payload.recent_post,
