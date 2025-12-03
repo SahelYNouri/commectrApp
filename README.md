@@ -185,7 +185,7 @@ This project was a way to practice building a small but end-to-end product:
 If you’d like to chat about the app, the stack, or working together:
 
 - **GitHub:** [`@SahelYNouri`](https://github.com/SahelYNouri)
-- **LinkedIn:** _(`https://www.linkedin.com/in/sahel-nouri-9696b1260/`)_
+- **LinkedIn:** _[`Sahel Nouri`](https://www.linkedin.com/in/sahel-nouri-9696b1260/)_
 
 ---
 
