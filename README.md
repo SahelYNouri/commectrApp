@@ -13,7 +13,7 @@ You paste:
 …and Commectr generates a tailored message, saves it to your history, and lets you track who you’ve contacted and who replied.
 
 > 💻 **Live app**: _Hosted on Vercel_  
-> (`https://commectr-app.vercel.app`)
+> (`https://commectr.com`)
 
 ---
 
@@ -154,7 +154,7 @@ This keeps the API usable from your app while blocking random third-party sites.
 You don’t need to clone or run anything locally.
 
 1. **Open the live app**  
-   _(Add your Vercel link here, e.g. `https://commectr-app.vercel.app`)_  
+   _(`https://commectr.com`)_  
 2. **Create an account** with your email and password.
 3. Go to **Generate**, fill in the target info and your goal, and click **Generate**.
 4. Copy the message and paste it into a LinkedIn DM.
