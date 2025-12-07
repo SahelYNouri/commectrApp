@@ -5,8 +5,10 @@ from .routes import router as api_router
 app = FastAPI()
 
 origins = [
-    "http://localhost:5173",                 # Vite dev
+    "http://localhost:5173",              # Vite dev
     "https://commectr-app.vercel.app",    #vercel url
+    "https://www.commectr.com",           #my domain
+    "https://commectr.com",                # my domain
 ]
 
 # Middleware looks at whether to block or allow requests from different origins, so not everyone has access to my backend APIS
