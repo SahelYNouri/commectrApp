@@ -9,7 +9,11 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 export async function signUp(email, password) {
 
     //calls supabase singup api
-  const { data, error } = await supabase.auth.signUp({ email, password });
+  const { data, error } = await supabase.auth.signUp({
+    email, 
+    password,
+    options: {emailRedirectTo: window.location.origin} //redirect to same page after email confirmation
+  });
   if (error) throw error;
   return data;
 }

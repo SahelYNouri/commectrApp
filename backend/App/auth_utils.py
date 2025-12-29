@@ -32,7 +32,7 @@ def get_current_user(request: Request) -> CurrentUser:
 
         #uses the JWTKEY and JWTALG to decode the token string, and it verifies the signature and expiration, returns as a dict if valid
     try:
-        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALG], options={"verify_aud": False},)
+        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALG], audience="authenticated") #adding audience="authenticated" to verify the token is for the authenticated role
     except JWTError as e:
         print("JWT decode error:", e)
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid token")
