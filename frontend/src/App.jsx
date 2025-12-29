@@ -10,32 +10,47 @@ export default function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is already logged in
-    getSession().then((s) => {
-      setSession(s);
-      if (s) {
+   
+    //only allow entry if email is confirmed
+    const initSession = async () => {
+      const s = await getSession();
+      if (s && s.user && s.user.email_confirmed_at) {
+        setSession(s);
         setView('dashboard');
+      } else if (s) {
+        // If a session exists but email isn't confirmed, clear it
+        await signOut();
+        setSession(null);
+        setView('login');
       }
       setLoading(false);
-    });
+    };
+
+    initSession();
 
     // Listen for auth changes
-    const { data: subscription } = supabase.auth.onAuthStateChange((_event, newSession) => {
-      setSession(newSession);
-      setView(newSession ? 'dashboard' : 'login');
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, newSession) => {
+      if (newSession?.user?.email_confirmed_at) {
+        // Only move to dashboard if user is officially confirmed
+        setSession(newSession);
+        setView('dashboard');
+      } else if (event === 'SIGNED_OUT') {
+        setSession(null);
+        setView('login');
+      } 
     });
 
-    return () => subscription.subscription.unsubscribe();
+    return () => subscription.unsubscribe();
   }, []);
 
-  function handleLoginSuccess(session) {
-    setSession(session);
-    setView('dashboard');
-  }
-
-  function handleSignupSuccess(session) {
-    setSession(session);
-    setView('dashboard');
+  function handleLoginSuccess(newSession) {
+    if (newSession?.user?.email_confirmed_at) {
+      setSession(newSession);
+      setView('dashboard');
+    } else {
+      alert("Please verify your email before logging in.");
+      signOut(); //clear unverified session
+    }
   }
 
   async function handleLogout() {
@@ -61,7 +76,6 @@ export default function App() {
     return (
       <Signup
         onSwitchToLogin={() => setView('login')}
-        onSignupSuccess={handleSignupSuccess}
       />
     );
   }

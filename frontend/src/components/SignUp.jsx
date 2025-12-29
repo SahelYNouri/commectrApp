@@ -1,19 +1,28 @@
 import { useState } from 'react';
+import { signUp } from '../auth';
+import { supabase } from '../auth';
 import '../styles/auth.css';
 
-export default function Signup({ onSwitchToLogin, onSignupSuccess }) {
+export default function Signup({ onSwitchToLogin}) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [needsVerification, setNeedsVerification] = useState(false); //tracks if verification msg is needed
 
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
 
+    //basic validation
     if (password !== confirmPassword) {
       setError('Passwords do not match');
+      return;
+    }
+
+    if (!email) {
+      setError('Email is required');
       return;
     }
 
@@ -25,17 +34,54 @@ export default function Signup({ onSwitchToLogin, onSignupSuccess }) {
     setLoading(true);
 
     try {
-      const { signUp } = await import('../auth');
-      await signUp(email, password);
-      
-      const { getSession } = await import('../auth');
-      const session = await getSession();
-      onSignupSuccess(session);
+      //signup helper from auth
+      const data = await signUp(email, password);
+
+      //Handle Duplicate Signups
+      //data.user exists but identities is empty, the email is already taken
+      if (data?.user && data?.user.identities?.length === 0) {
+        setError('An account with this email already exists. Please log in.');
+        setLoading(false);
+        return;
+      }
+
+      //Success, Show the "Check your email" container
+      setNeedsVerification(true);
+
     } catch (err) {
       setError(err.message || 'Could not create account. Please try again.');
     } finally {
       setLoading(false);
     }
+
+  }
+
+  //verification Screen View
+  if (needsVerification) {
+    return (
+      <div className="auth-container">
+        <div className="auth-card">
+          <div className="auth-header">
+            <div className="logo">
+              <img src="/logo-mark.png" alt="Commectr Logo" className="logo-mark" />
+              <h1 className="logo-text">Commectr</h1>
+            </div>
+            <h2 className="logo-text">Verify your email</h2>
+          </div>
+          <div className="verification-msg">
+            <p>We've sent a verification link to:</p>
+            <p className="user-email"><strong>{email}</strong></p>
+            <p>Please check your inbox and click the link to activate your account.</p>
+          </div>
+          <button 
+            className="primary-button" 
+            onClick={onSwitchToLogin}
+          >
+            Back to Login
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
