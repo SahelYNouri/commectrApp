@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import '../styles/auth.css';
 
-export default function Login({ onSwitchToSignup, onLoginSuccess }) {
+export default function Login({ onSwitchToSignup, onLoginSuccess, onForgotPassword }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -117,6 +117,11 @@ export default function Login({ onSwitchToSignup, onLoginSuccess }) {
             <span className="footer-text">Don&apos;t have an account?</span>
             <button className="link-button" onClick={onSwitchToSignup}>
               Sign up
+            </button>
+          </div>
+          <div className="footer-row">
+            <button className="link-button forgot-btn" onClick={onForgotPassword}>
+              Forgot password?
             </button>
           </div>
         </div>
