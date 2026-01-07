@@ -86,15 +86,24 @@
 .auth-card {
   background: #0b1120;
   border-radius: 24px;
-  padding: 28px 28px 24px;
-  max-width: 420px;
+  padding: 56px 48px;
+  max-width: 480px;
   width: 100%;
   border: 1px solid rgba(148, 163, 184, 0.35);
   box-shadow: 0 22px 45px rgba(15, 23, 42, 0.9);
+
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
 }
 
 .auth-header {
   margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  text-align: left;
+
 }
 
 .logo {
@@ -230,7 +239,6 @@
   text-decoration: underline;
 }
 
-/* ===== Legacy single-column container (still used by older code) ===== */
 
 .auth-container {
   min-height: 100vh;
@@ -259,4 +267,33 @@
     order: 1;
     max-width: 100%;
   }
+}
+
+.verification-msg {
+  display: flex;
+  flex-direction: column;
+  gap: 12px; 
+  color: #94a3b8; 
+  line-height: 1.5; 
+ 
+}
+
+.forgot-btn {
+  font-size: 0.85rem;
+  opacity: 0.8;
+  margin-top: 12px;
+  text-decoration: underline;
+  color: #94a3b8; /* Soft slate color */
+}
+
+.forgot-btn:hover {
+  opacity: 1;
+  color: #3b82f6; /* Highlight on hover */
+}
+
+.footer-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
 }

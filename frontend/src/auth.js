@@ -9,7 +9,11 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 export async function signUp(email, password) {
 
     //calls supabase singup api
-  const { data, error } = await supabase.auth.signUp({ email, password });
+  const { data, error } = await supabase.auth.signUp({
+    email, 
+    password,
+    options: {emailRedirectTo: window.location.origin} //redirect to same page after email confirmation
+  });
   if (error) throw error;
   return data;
 }
@@ -29,4 +33,22 @@ export async function signOut() {
 export async function getSession() {
   const { data } = await supabase.auth.getSession();
   return data.session;
+}
+
+//send the reset link to the user's email
+export async function sendPasswordReset(email) {
+  const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin, 
+  });
+  if (error) throw error;
+  return data;
+}
+
+//update the user's password once they are on the reset page
+export async function updatePassword(newPassword) {
+  const { data, error } = await supabase.auth.updateUser({
+    password: newPassword
+  });
+  if (error) throw error;
+  return data;
 }

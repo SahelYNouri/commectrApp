@@ -3,6 +3,8 @@ import { supabase, getSession, signOut } from './auth';
 import Login from './components/Login';
 import Signup from './components/SignUp';
 import Dashboard from './components/Dashboard';
+import ForgotPassword from './components/ForgotPassword';
+import ResetPassword from './components/ResetPassword';
 
 export default function App() {
   const [view, setView] = useState('login'); // 'login' | 'signup' | 'dashboard'
@@ -10,32 +12,57 @@ export default function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is already logged in
-    getSession().then((s) => {
-      setSession(s);
-      if (s) {
+    // Check for initial session
+    const initSession = async () => {
+
+      const hash = window.location.hash;
+      
+      // If the URL contains a recovery token, show reset password page immediately
+      if (hash && hash.includes('type=recovery')) {
+        setView('reset-password');
+        setLoading(false);
+        return; // Don't check session yet, let PASSWORD_RECOVERY event handle it
+      }
+      
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (session?.user?.email_confirmed_at) {
+        setSession(session);
         setView('dashboard');
       }
+      
       setLoading(false);
+    };
+
+    initSession();
+
+    // Listen for auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, newSession) => {
+      console.log('Auth event:', event);
+      
+      if (event === 'PASSWORD_RECOVERY') {
+        // User clicked the reset link - show reset password form
+        setView('reset-password');
+      } else if (event === 'SIGNED_IN' && newSession?.user?.email_confirmed_at) {
+        setSession(newSession);
+        setView('dashboard');
+      } else if (event === 'SIGNED_OUT') {
+        setSession(null);
+        setView('login');
+      }
     });
 
-    // Listen for auth changes
-    const { data: subscription } = supabase.auth.onAuthStateChange((_event, newSession) => {
-      setSession(newSession);
-      setView(newSession ? 'dashboard' : 'login');
-    });
-
-    return () => subscription.subscription.unsubscribe();
+    return () => subscription.unsubscribe();
   }, []);
 
-  function handleLoginSuccess(session) {
-    setSession(session);
-    setView('dashboard');
-  }
-
-  function handleSignupSuccess(session) {
-    setSession(session);
-    setView('dashboard');
+  function handleLoginSuccess(newSession) {
+    if (newSession?.user?.email_confirmed_at) {
+      setSession(newSession);
+      setView('dashboard');
+    } else {
+      alert("Please verify your email before logging in.");
+      signOut(); //clear unverified session
+    }
   }
 
   async function handleLogout() {
@@ -44,27 +71,32 @@ export default function App() {
     setView('login');
   }
 
+  function handleResetSuccess() {
+    setView('login');
+    setSession(null);
+  }
+
   if (loading) {
     return <div className="loading">Loading...</div>;
   }
 
-  if (view === 'login') {
-    return (
-      <Login
-        onSwitchToSignup={() => setView('signup')}
-        onLoginSuccess={handleLoginSuccess}
-      />
-    );
+  //view Router
+  switch (view) {
+    case 'signup':
+      return <Signup onSwitchToLogin={() => setView('login')} />;
+    case 'forgot-password':
+      return <ForgotPassword onBackToLogin={() => setView('login')} />;
+    case 'reset-password':
+      return <ResetPassword onResetSuccess={handleResetSuccess} />;
+    case 'dashboard':
+      return <Dashboard onLogout={handleLogout} />;
+    default:
+      return (
+        <Login
+          onSwitchToSignup={() => setView('signup')}
+          onForgotPassword={() => setView('forgot-password')}
+          onLoginSuccess={handleLoginSuccess}
+        />
+      );
   }
-
-  if (view === 'signup') {
-    return (
-      <Signup
-        onSwitchToLogin={() => setView('login')}
-        onSignupSuccess={handleSignupSuccess}
-      />
-    );
-  }
-
-  return <Dashboard onLogout={handleLogout} />;
 }
