@@ -3,6 +3,8 @@ import { supabase, getSession, signOut } from './auth';
 import Login from './components/Login';
 import Signup from './components/SignUp';
 import Dashboard from './components/Dashboard';
+import ForgotPassword from './components/ForgotPassword';
+import ResetPassword from './components/ResetPassword';
 
 export default function App() {
   const [view, setView] = useState('login'); // 'login' | 'signup' | 'dashboard'
@@ -10,34 +12,44 @@ export default function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-   
-    //only allow entry if email is confirmed
+    // Check for initial session
     const initSession = async () => {
-      const s = await getSession();
-      if (s && s.user && s.user.email_confirmed_at) {
-        setSession(s);
-        setView('dashboard');
-      } else if (s) {
-        // If a session exists but email isn't confirmed, clear it
-        await signOut();
-        setSession(null);
-        setView('login');
+
+      const hash = window.location.hash;
+      
+      // If the URL contains a recovery token, show reset password page immediately
+      if (hash && hash.includes('type=recovery')) {
+        setView('reset-password');
+        setLoading(false);
+        return; // Don't check session yet, let PASSWORD_RECOVERY event handle it
       }
+      
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (session?.user?.email_confirmed_at) {
+        setSession(session);
+        setView('dashboard');
+      }
+      
       setLoading(false);
     };
 
     initSession();
 
-    // Listen for auth changes
+    // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, newSession) => {
-      if (newSession?.user?.email_confirmed_at) {
-        // Only move to dashboard if user is officially confirmed
+      console.log('Auth event:', event);
+      
+      if (event === 'PASSWORD_RECOVERY') {
+        // User clicked the reset link - show reset password form
+        setView('reset-password');
+      } else if (event === 'SIGNED_IN' && newSession?.user?.email_confirmed_at) {
         setSession(newSession);
         setView('dashboard');
       } else if (event === 'SIGNED_OUT') {
         setSession(null);
         setView('login');
-      } 
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -59,26 +71,32 @@ export default function App() {
     setView('login');
   }
 
+  function handleResetSuccess() {
+    setView('login');
+    setSession(null);
+  }
+
   if (loading) {
     return <div className="loading">Loading...</div>;
   }
 
-  if (view === 'login') {
-    return (
-      <Login
-        onSwitchToSignup={() => setView('signup')}
-        onLoginSuccess={handleLoginSuccess}
-      />
-    );
+  //view Router
+  switch (view) {
+    case 'signup':
+      return <Signup onSwitchToLogin={() => setView('login')} />;
+    case 'forgot-password':
+      return <ForgotPassword onBackToLogin={() => setView('login')} />;
+    case 'reset-password':
+      return <ResetPassword onResetSuccess={handleResetSuccess} />;
+    case 'dashboard':
+      return <Dashboard onLogout={handleLogout} />;
+    default:
+      return (
+        <Login
+          onSwitchToSignup={() => setView('signup')}
+          onForgotPassword={() => setView('forgot-password')}
+          onLoginSuccess={handleLoginSuccess}
+        />
+      );
   }
-
-  if (view === 'signup') {
-    return (
-      <Signup
-        onSwitchToLogin={() => setView('login')}
-      />
-    );
-  }
-
-  return <Dashboard onLogout={handleLogout} />;
 }
